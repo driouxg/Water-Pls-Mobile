@@ -8,10 +8,13 @@ import java.util.Map;
 public class StompMessage extends ValueObject {
     private Map<String, String> headers;
     private String body;
-    private StompCommand command;
+    private StompCommand stompCommand;
+    private String command;
 
-    public StompMessage(StompCommand command, String body, Map<String, String> headers) {
-        this.command = command;
+    public StompMessage(StompCommand stompCommand, String body, Map<String, String> headers) {
+        this.stompCommand = stompCommand;
+        command = stompCommand.getCommand();
+
         this.body = body;
         this.headers = headers;
     }
@@ -28,7 +31,11 @@ public class StompMessage extends ValueObject {
         return headers;
     }
 
-    public StompCommand getCommand() {
+    public StompCommand getStompCommand() {
+        return stompCommand;
+    }
+
+    public String getCommand() {
         return command;
     }
 }

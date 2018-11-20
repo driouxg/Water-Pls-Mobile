@@ -12,24 +12,27 @@ import java.util.Map;
 
 public class StompMessageSerializer {
     public static String serialize(StompMessage message){
+        System.out.println("Serializing message");
         StringBuilder buffer = new StringBuilder();
-
+        System.out.println("Serializing message1");
         buffer.append(message.getCommand() + "\n");
-
+        System.out.println("Serializing message2");
         for(Map.Entry<String, String> header : message.getHeaders().entrySet())
         {
             buffer.append(header.getKey()).append(":").append(header.getValue()).append("\n");
         }
-
+        System.out.println("Serializing message3");
         buffer.append("\n");
         buffer.append(message.getBody());
         buffer.append('\0');
-
+        System.out.println("serialized message");
+        System.out.println("THE Serialized MESSAGE: " + buffer.toString());
         return buffer.toString();
     }
 
     public static StompMessage deserialize(String message)
     {
+        System.out.println("deserializing message");
         String[] lines = message.split("\n");
 
         StompCommand command = new StompCommand(lines[0].trim());
@@ -63,6 +66,7 @@ public class StompMessageSerializer {
         //result.setBody(body);
 
         StompMessage result = new StompMessage(command, body, headers);
+        System.out.println("deserialized message");
         return result;
     }
 }

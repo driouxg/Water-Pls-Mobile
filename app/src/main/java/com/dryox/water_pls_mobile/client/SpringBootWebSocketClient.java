@@ -108,12 +108,13 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         closeHandler = new CloseHandler(webSocket);
     }
 
-    private void sendStompMessage(WebSocket websocket, String endpoint) {
+    public void sendStompMessage(WebSocket websocket, String endpoint) {
         StompCommand command = new StompCommand("SEND");
         Map<String, String> headers = new HashMap<>();
         headers.put("destination", endpoint);
         String body = "Hi there server, it's me the client!";
         StompMessage message = new StompMessage(command, body, headers);
+        System.out.println("The serialized message ready to go: " + "\n" + StompMessageSerializer.serialize(message));
         websocket.send(StompMessageSerializer.serialize(message));
         //message.put("content-type", "text/html");
     }

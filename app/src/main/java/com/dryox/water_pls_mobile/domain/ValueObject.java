@@ -2,12 +2,13 @@ package com.dryox.water_pls_mobile.domain;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ValueObject {
+public class ValueObject {
 
     private Iterable<Object> GetEqualityComponents() {
         List<Object> list = new ArrayList<>();
