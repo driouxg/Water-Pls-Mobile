@@ -13,7 +13,7 @@ public class StompMessage extends ValueObject {
 
     public StompMessage(StompCommand stompCommand, String body, Map<String, String> headers) {
         this.stompCommand = stompCommand;
-        command = stompCommand.getCommand();
+        command = stompCommand.GetCommand();
 
         this.body = body;
         this.headers = headers;

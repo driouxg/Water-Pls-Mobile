@@ -1,6 +1,7 @@
 package com.dryox.water_pls_mobile.domain;
 
 public enum StompCommandEnum {
+    /* Stomp Client Commands */
     SEND("SEND"),
     CONNECT("CONNECT"),
     SUBSCRIBE("SUBSCRIBE"),
@@ -10,7 +11,13 @@ public enum StompCommandEnum {
     ABORT("ABORT"),
     ACK("ACK"),
     NACK("NACK"),
-    DISCONNECT("DISCONNECT");
+    DISCONNECT("DISCONNECT"),
+
+    /* Stomp Server Commands */
+    CONNECTED("CONNECTED"),
+    MESSAGE("MESSAGE"),
+    RECEIPT("RECEIPT"),
+    ERROR("ERROR");
 
     private String command;
 

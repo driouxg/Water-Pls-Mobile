@@ -6,10 +6,11 @@ import com.dryox.water_pls_mobile.domain.StompMessage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import okhttp3.WebSocket;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okio.ByteString;
 
@@ -20,7 +21,6 @@ import okio.ByteString;
  *
  * important resources about STOMP
  * https://stomp.github.io/stomp-specification-1.2.html
- *
  */
 
 public final class SpringBootWebSocketClient extends WebSocketListener {
@@ -50,7 +50,7 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
     public TopicHandler subscribe(String topic) {
         TopicHandler handler = new TopicHandler(topic);
         topics.put(topic, handler);
-        if(webSocket != null){
+        if (webSocket != null) {
             sendSubscribeMessage(webSocket, topic);
         }
         return handler;
@@ -61,7 +61,7 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
     }
 
     public TopicHandler getTopicHandler(String topic) {
-        if(topics.containsKey(topic)){
+        if (topics.containsKey(topic)) {
             return topics.get(topic);
         }
         return null;
@@ -73,7 +73,7 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
 
     public void connect(String address) {
         OkHttpClient client = new OkHttpClient.Builder()
-                .readTimeout(0,  TimeUnit.MILLISECONDS)
+                .readTimeout(0, TimeUnit.MILLISECONDS)
                 .build();
 
         Request request = new Request.Builder()
@@ -85,14 +85,8 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         client.dispatcher().executorService().shutdown();
     }
 
-    @Override public void onOpen(WebSocket webSocket, Response response) {
-
-        /*
-        webSocket.send("Hello...");
-        webSocket.send("...World!");
-        webSocket.send(ByteString.decodeHex("deadbeef"));
-        */
-
+    @Override
+    public void onOpen(WebSocket webSocket, Response response) {
         System.out.println("Opened connection to server!");
 
         this.webSocket = webSocket;
@@ -100,10 +94,9 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         sendConnectMessage(webSocket);
         sendStompMessage(webSocket, "/app/user");
 
-        for(String topic : topics.keySet()){
+        for (String topic : topics.keySet()) {
             sendSubscribeMessage(webSocket, topic);
         }
-
 
         closeHandler = new CloseHandler(webSocket);
     }
@@ -112,10 +105,10 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         StompCommand command = new StompCommand("SEND");
         Map<String, String> headers = new HashMap<>();
         headers.put("destination", endpoint);
-        String body = "Hi there server, it's me the client!";
+        String body = "\"message\":\"Hi there server, it's me the client\"";
         StompMessage message = new StompMessage(command, body, headers);
         System.out.println("The serialized message ready to go: " + "\n" + StompMessageSerializer.serialize(message));
-        websocket.send(StompMessageSerializer.serialize(message));
+        SendMessage(webSocket, message);
         //message.put("content-type", "text/html");
     }
 
@@ -125,7 +118,7 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         headers.put("accept-version", "1.1");
         headers.put("heart-beat", "10000,10000");
         StompMessage message = new StompMessage(command, "", headers);
-        webSocket.send(StompMessageSerializer.serialize(message));
+        SendMessage(webSocket, message);
     }
 
     private void sendSubscribeMessage(WebSocket webSocket, String topic) {
@@ -134,11 +127,15 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         headers.put("id", id);
         headers.put("destination", topic);
         StompMessage message = new StompMessage(command, "", headers);
+        SendMessage(webSocket, message);
+    }
+
+    public void SendMessage(WebSocket webSocket, StompMessage message) {
         webSocket.send(StompMessageSerializer.serialize(message));
     }
 
     public void disconnect() {
-        if(webSocket != null){
+        if (webSocket != null) {
             closeHandler.close();
             webSocket = null;
             closeHandler = null;
@@ -149,41 +146,42 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         return closeHandler != null;
     }
 
-    @Override public void onMessage(WebSocket webSocket, String text) {
+    @Override
+    public void onMessage(WebSocket webSocket, String text) {
         //System.out.println("MESSAGE: " + text);
         StompMessage message = StompMessageSerializer.deserialize(text);
+        System.out.println("onMessage called: " + text);
         String topic = message.getHeader("destination");
-        if(topics.containsKey(topic)){
+        if (topics.containsKey(topic)) {
             topics.get(topic).onMessage(message);
         }
     }
 
-    @Override public void onMessage(WebSocket webSocket, ByteString bytes) {
+    @Override
+    public void onMessage(WebSocket webSocket, ByteString bytes) {
         System.out.println("MESSAGE: " + bytes.hex());
     }
 
-    @Override public void onClosing(WebSocket webSocket, int code, String reason) {
+    @Override
+    public void onClosing(WebSocket webSocket, int code, String reason) {
         webSocket.close(1000, null);
         System.out.println("CLOSE: " + code + " " + reason);
     }
 
-    @Override public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+    @Override
+    public void onFailure(WebSocket webSocket, Throwable t, Response response) {
         t.printStackTrace();
     }
 
     //public static void main(String... args) {
-//
-//
     //    SpringBootWebSocketClient client = new SpringBootWebSocketClient();
-    //    TopicHandler handler = client.subscribe("/topics/user");
+    //    TopicHandler handler = client.subscribe("/topic/user");
     //    handler.addListener(new StompMessageListener() {
     //        @Override
     //        public void onMessage(StompMessage message) {
-    //            System.out.println(message.getHeader("destination") + ": " + message.getBody());
+    //            System.out.println(message.getHeader("Message received in main! destination") + ": " + message.getBody());
     //        }
     //    });
     //    client.connect("ws://localhost:8091/websocket-example");
-//
-    //    //client.sendStompMessage(client.getWebSocket(), "/app/user");
     //}
 }

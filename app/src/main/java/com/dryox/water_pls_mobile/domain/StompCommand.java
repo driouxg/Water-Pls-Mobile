@@ -5,16 +5,16 @@ public class StompCommand extends ValueObject {
 
     public StompCommand(String command) {
         this.command = command;
-        validateCommand();
+        ValidateCommand();
     }
 
-    private void validateCommand() {
+    private void ValidateCommand() {
         if (!StompCommandEnum.isStompCommand(command)) {
-            throw new IllegalArgumentException("Not a valid stomp command.");
+            throw new IllegalArgumentException("Not a valid stomp command: " + command);
         }
     }
 
-    public String getCommand() {
+    public String GetCommand() {
         return command;
     }
 }
