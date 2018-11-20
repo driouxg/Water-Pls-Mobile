@@ -2,6 +2,8 @@ package com.dryox.water_pls_mobile.client;
 
 import com.dryox.water_pls_mobile.domain.StompCommand;
 import com.dryox.water_pls_mobile.domain.StompMessage;
+import com.noveogroup.android.log.Logger;
+import com.noveogroup.android.log.LoggerManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +26,8 @@ import okio.ByteString;
  */
 
 public final class SpringBootWebSocketClient extends WebSocketListener {
+
+    private static final Logger LOGGER = LoggerManager.getLogger("root");
 
     private Map<String, TopicHandler> topics = new HashMap<>();
     private CloseHandler closeHandler;
@@ -105,11 +109,10 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         StompCommand command = new StompCommand("SEND");
         Map<String, String> headers = new HashMap<>();
         headers.put("destination", endpoint);
+        //headers.put("content-type", "text/plain");
         String body = "\"message\":\"Hi there server, it's me the client\"";
         StompMessage message = new StompMessage(command, body, headers);
-        System.out.println("The serialized message ready to go: " + "\n" + StompMessageSerializer.serialize(message));
         SendMessage(webSocket, message);
-        //message.put("content-type", "text/html");
     }
 
     private void sendConnectMessage(WebSocket webSocket) {
@@ -148,9 +151,8 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
 
     @Override
     public void onMessage(WebSocket webSocket, String text) {
-        //System.out.println("MESSAGE: " + text);
         StompMessage message = StompMessageSerializer.deserialize(text);
-        System.out.println("onMessage called: " + text);
+        LOGGER.i("onMessage called: " + text);
         String topic = message.getHeader("destination");
         if (topics.containsKey(topic)) {
             topics.get(topic).onMessage(message);
@@ -172,16 +174,4 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
         t.printStackTrace();
     }
-
-    //public static void main(String... args) {
-    //    SpringBootWebSocketClient client = new SpringBootWebSocketClient();
-    //    TopicHandler handler = client.subscribe("/topic/user");
-    //    handler.addListener(new StompMessageListener() {
-    //        @Override
-    //        public void onMessage(StompMessage message) {
-    //            System.out.println(message.getHeader("Message received in main! destination") + ": " + message.getBody());
-    //        }
-    //    });
-    //    client.connect("ws://localhost:8091/websocket-example");
-    //}
 }

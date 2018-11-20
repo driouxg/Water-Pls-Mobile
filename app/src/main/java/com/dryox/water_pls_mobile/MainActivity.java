@@ -7,23 +7,16 @@ import com.dryox.water_pls_mobile.client.SpringBootWebSocketClient;
 import com.dryox.water_pls_mobile.client.StompMessageListener;
 import com.dryox.water_pls_mobile.client.TopicHandler;
 import com.dryox.water_pls_mobile.domain.StompMessage;
+import com.dryox.water_pls_mobile.service.ConnectClientToServerTask;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
 
-        // This currently fails to connect to localhost. Need to perform in an asynchronous task!
-//
-        //SpringBootWebSocketClient client = new SpringBootWebSocketClient();
-//
-        //TopicHandler handler = client.subscribe("/topics/user");
-        //handler.addListener(new StompMessageListener() {
-        //    @Override
-        //    public void onMessage(StompMessage message) {
-        //        System.out.println(message.getHeader("destination") + ": " + message.getBody()); }});
-        //client.connect("ws://localhost:8091/websocket-example");
+        ConnectClientToServerTask task = new ConnectClientToServerTask();
+        task.execute();
     }
 }
