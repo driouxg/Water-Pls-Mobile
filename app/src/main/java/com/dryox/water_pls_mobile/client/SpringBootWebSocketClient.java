@@ -1,5 +1,7 @@
 package com.dryox.water_pls_mobile.client;
 
+import com.dryox.water_pls_mobile.domain.DonaterVO;
+import com.dryox.water_pls_mobile.domain.GeographicLocation;
 import com.dryox.water_pls_mobile.domain.StompCommand;
 import com.dryox.water_pls_mobile.domain.StompMessage;
 import com.noveogroup.android.log.Logger;
@@ -20,7 +22,7 @@ import okio.ByteString;
  * Created by chen0 on 9/12/2017.
  *
  * @author drioux.guidry
- *
+ * <p>
  * important resources about STOMP
  * https://stomp.github.io/stomp-specification-1.2.html
  */
@@ -96,7 +98,7 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         this.webSocket = webSocket;
 
         sendConnectMessage(webSocket);
-        sendStompMessage(webSocket, "/app/user");
+        sendStompMessage(webSocket, "/api/donater/register");
 
         for (String topic : topics.keySet()) {
             sendSubscribeMessage(webSocket, topic);
@@ -110,7 +112,12 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         Map<String, String> headers = new HashMap<>();
         headers.put("destination", endpoint);
         //headers.put("content-type", "text/plain");
-        String body = "\"message\":\"Hi there server, it's me the client\"";
+
+        GeographicLocation geographicLocation = new GeographicLocation("1.234", "1.234");
+        DonaterVO donaterVO = new DonaterVO("Hingle", "McCringleBerry", geographicLocation);
+
+        String body = donaterVO.toJSON();
+
         StompMessage message = new StompMessage(command, body, headers);
         SendMessage(webSocket, message);
     }

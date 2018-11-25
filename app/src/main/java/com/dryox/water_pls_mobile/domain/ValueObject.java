@@ -1,5 +1,7 @@
 package com.dryox.water_pls_mobile.domain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
 
@@ -53,16 +55,32 @@ public class ValueObject {
         return GetEqualityComponents().equals(valueObject.GetEqualityComponents());
     }
 
+    @Override
     public int hashCode() {
         return Objects.hash(GetEqualityComponents());
     }
 
+    public String toJSON() {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public String toString() {
         final ToStringHelper helper = MoreObjects.toStringHelper(this);
 
         for (Field o : GetFields()) {
             try {
-                helper.add(o.getName(), o.get(this).toString());
+                // Android 2+ adds a $change field to classes when using reflection, which causes NPE
+                if (!o.getName().equals("$change")) {
+                    helper.add(o.getName(), o.get(this).toString());
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
