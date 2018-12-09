@@ -21,10 +21,6 @@ public class ConnectClientToServerTask extends AsyncTask<Void, Void, Void> {
                 public void onMessage(StompMessage message) {
                     System.out.println(message.getHeader("destination") + ": " + message.getBody()); }});
             client.connect("ws://10.0.2.2:8091/websocket-example");
-
-            if (client.getWebSocket() == null) {
-                System.out.println("IT'S NULL YO");
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

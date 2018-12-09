@@ -1,7 +1,9 @@
 package com.dryox.water_pls_mobile.client;
 
-import com.dryox.water_pls_mobile.domain.DonaterVO;
-import com.dryox.water_pls_mobile.domain.GeographicLocation;
+import com.dryox.water_pls_mobile.domain.value.DonaterVO;
+import com.dryox.water_pls_mobile.domain.value.GeoCoordinateVO;
+import com.dryox.water_pls_mobile.domain.value.GeographicLocationVO;
+import com.dryox.water_pls_mobile.domain.value.NameVO;
 import com.dryox.water_pls_mobile.domain.StompCommand;
 import com.dryox.water_pls_mobile.domain.StompMessage;
 import com.noveogroup.android.log.Logger;
@@ -111,10 +113,13 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
         StompCommand command = new StompCommand("SEND");
         Map<String, String> headers = new HashMap<>();
         headers.put("destination", endpoint);
-        //headers.put("content-type", "text/plain");
 
-        GeographicLocation geographicLocation = new GeographicLocation("1.234", "1.234");
-        DonaterVO donaterVO = new DonaterVO("Hingle", "McCringleBerry", geographicLocation);
+        NameVO firstName = new NameVO("Hingle");
+        NameVO lastName = new NameVO("McCringleBerry");
+        GeoCoordinateVO latitude = new GeoCoordinateVO(1.53f);
+        GeoCoordinateVO longitude = new GeoCoordinateVO(1.2234f);
+        GeographicLocationVO geographicLocation = new GeographicLocationVO(latitude, longitude);
+        DonaterVO donaterVO = new DonaterVO(firstName, lastName, geographicLocation);
 
         String body = donaterVO.toJSON();
 
@@ -168,13 +173,13 @@ public final class SpringBootWebSocketClient extends WebSocketListener {
 
     @Override
     public void onMessage(WebSocket webSocket, ByteString bytes) {
-        System.out.println("MESSAGE: " + bytes.hex());
+        LOGGER.i("MESSAGE: " + bytes.hex());
     }
 
     @Override
     public void onClosing(WebSocket webSocket, int code, String reason) {
         webSocket.close(1000, null);
-        System.out.println("CLOSE: " + code + " " + reason);
+        LOGGER.i("CLOSE: " + code + " " + reason);
     }
 
     @Override

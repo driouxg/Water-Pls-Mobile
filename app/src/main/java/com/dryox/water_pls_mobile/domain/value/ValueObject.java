@@ -1,4 +1,4 @@
-package com.dryox.water_pls_mobile.domain;
+package com.dryox.water_pls_mobile.domain.value;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ValueObject {
+public abstract class ValueObject {
 
     private Iterable<Object> GetEqualityComponents() {
         List<Object> list = new ArrayList<>();

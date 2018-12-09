@@ -1,5 +1,7 @@
 package com.dryox.water_pls_mobile.domain;
 
+import com.dryox.water_pls_mobile.domain.value.ValueObject;
+
 import java.util.Map;
 
 /**
