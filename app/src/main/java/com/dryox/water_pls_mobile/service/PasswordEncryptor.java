@@ -1,11 +1,15 @@
 package com.dryox.water_pls_mobile.service;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+//import java.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -13,12 +17,18 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * https://developer.android.com/guide/topics/security/cryptography
  */
 public class PasswordEncryptor {
     private String password;
+
+    public String ciphertext;
+    public String iv;
+    public SecretKey key;
 
     public PasswordEncryptor(String password) {
         this.password = password;
@@ -72,7 +82,7 @@ public class PasswordEncryptor {
         return returnValue;
     }*/
 
-    public void verifyDigitalSignature() {
+    /*public void verifyDigitalSignature() {
         byte[] message = password.getBytes();
         byte[] signature = ...;
         PublicKey key = ...;
@@ -80,7 +90,7 @@ public class PasswordEncryptor {
         s.initVerify(key);
         s.update(message);
         boolean valid = s.verify(signature);
-    }
+    }*/
 
     public byte[] generateDigitalSignature() {
         byte[] message = password.getBytes();
@@ -106,6 +116,7 @@ public class PasswordEncryptor {
             s.initSign(key);
             s.update(message);
             byte[] signature = s.sign();
+            return signature;
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
@@ -113,6 +124,7 @@ public class PasswordEncryptor {
         } catch (SignatureException e) {
             e.printStackTrace();
         }
+        return "derp".getBytes();
     }
 
     public byte[] encryptPassword() {
@@ -125,7 +137,15 @@ public class PasswordEncryptor {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             byte[] ciphertext = cipher.doFinal(plaintext);
+            System.out.println(ciphertext);
+            System.out.println(new String(ciphertext));
             byte[] iv = cipher.getIV();
+
+            this.ciphertext = new String(ciphertext);
+            this.iv = new String(iv);
+            this.key = key;
+
+            return ciphertext;
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchPaddingException e) {
@@ -137,6 +157,35 @@ public class PasswordEncryptor {
         } catch (IllegalBlockSizeException e) {
             e.printStackTrace();
         }
+        return "derp".getBytes();
+    }
+
+    public byte[] decryptPassword(String initVector, SecretKey key, String encrypted) {
+        Cipher cipher = null;
+        try {
+            IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
+            //SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
+
+            cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.DECRYPT_MODE, key, iv);
+            byte[] original = cipher.doFinal(Base64.decodeBase64(encrypted));
+            return original;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+        return "derp".getBytes();
     }
 }
 
